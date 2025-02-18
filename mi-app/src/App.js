@@ -13,8 +13,14 @@ function App() {
   // Función para obtener las tareas
   const fetchTasks = async () => {
     try {
-      const response = await fetch("https://tarea-backend-3.onrender.com/tasks");  // Aquí cambias la URL local por la de Render
+      console.log("Haciendo petición GET a /tasks..."); // Depuración
+      const response = await fetch("https://tarea-backend-3.onrender.com/tasks");  // Ruta del backend en Render
+      console.log("Respuesta recibida:", response); // Depuración
+      if (!response.ok) {
+        throw new Error("Error al obtener las tareas");
+      }
       const result = await response.json();
+      console.log("Tareas obtenidas:", result); // Depuración
       setTasks(result);
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -24,16 +30,21 @@ function App() {
   // Función para agregar una tarea
   const addTask = async () => {
     const newTask = { title, description };
-
     try {
-      const response = await fetch("https://tarea-backend-3.onrender.com/tasks", {  // Aquí también usas la URL de Render
+      console.log("Haciendo petición POST a /tasks con:", newTask); // Depuración
+      const response = await fetch("https://tarea-backend-3.onrender.com/tasks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(newTask),
       });
+      console.log("Respuesta de POST:", response); // Depuración
+      if (!response.ok) {
+        throw new Error("Error al agregar la tarea");
+      }
       const addedTask = await response.json();
+      console.log("Tarea agregada:", addedTask); // Depuración
       setTasks([...tasks, addedTask]);  // Actualizar el estado de las tareas
       setTitle("");  // Limpiar el campo de título
       setDescription("");  // Limpiar el campo de descripción
@@ -45,10 +56,15 @@ function App() {
   // Función para eliminar una tarea
   const deleteTask = async (id) => {
     try {
-      await fetch(`https://tarea-backend-3.onrender.com/tasks/${id}`, {  // Aquí también se usa la URL de Render
+      console.log("Haciendo petición DELETE a /tasks/" + id); // Depuración
+      const response = await fetch(`https://tarea-backend-3.onrender.com/tasks/${id}`, {
         method: "DELETE",
       });
-      setTasks(tasks.filter((task) => task.id !== id));  // Actualizar el estado
+      console.log("Respuesta DELETE:", response); // Depuración
+      if (!response.ok) {
+        throw new Error("Error al eliminar la tarea");
+      }
+      setTasks(tasks.filter((task) => task._id !== id));  // Actualizar el estado de las tareas
     } catch (error) {
       console.error("Error deleting task:", error);
     }
@@ -74,9 +90,9 @@ function App() {
 
       <ul>
         {tasks.map((task) => (
-          <li key={task.id}>
+          <li key={task._id}>
             <strong>{task.title}</strong>: {task.description}
-            <button onClick={() => deleteTask(task.id)}>Eliminar</button>
+            <button onClick={() => deleteTask(task._id)}>Eliminar</button>
           </li>
         ))}
       </ul>
